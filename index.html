@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RGBand</title>
+  <script src="../build/tracking-min.js"></script>
+  <style>
+    body{
+      background-color: #b5d1ff;
+    }
+    #videoWrapper{
+      width: 100%;
+      text-align: center;
+      vertical-align: 30%;
+    }
+  </style>
+</head>
+<body>
+  <div id="videoWrapper">
+    <video id="myVideo" width="500" height="400" preload autoplay loop muted></video>
+  </div>
+
+  <script>
+
+
+    const bass = './sounds/bass.mp3';
+    const snare = './sounds/snare.mp3';
+
+    const context = new AudioContext();
+    // const playButton = document.querySelector('#play');
+
+    let bassSound;
+    let snareSound;
+
+    function fetchSound(source){
+
+      return window.fetch(source)
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+            .then(audioBuffer => {
+              // playButton.disabled = false;
+              // console.log("Audio Buffer:" + audioBuffer);
+
+              return audioBuffer;
+            });
+
+      // return tmpSound;
+    }
+
+    fetchSound(bass).then( soundData => {
+      console.log(`sounddata: ${soundData}`);
+      bassSound = soundData;
+    });
+    // console.log(`TMP SOUND: ${anotherSound}`);
+
+    fetchSound(snare).then( soundData => {
+      console.log(`sounddata: ${soundData}`);
+      snareSound = soundData;
+    });
+
+      // playButton.onclick = () => play(yodelBuffer);
+
+    function play(audioBuffer) {
+      const source = context.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(context.destination);
+      source.start();
+    }
+
+
+    // var stream;
+    // var snare = new Audio('./sounds/snare.mp3');
+    // var bass = new Audio('./sounds/bass.mp3');
+    var now  = new Date();
+
+
+
+    var video = document.getElementById('myVideo');
+
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+
+     video.src = window.URL.createObjectURL(stream);
+     video.play();
+
+     });
+    }
+
+
+    // var orange = '#8e2121';
+
+    tracking.ColorTracker.registerColor('orange', function(r, g, b) {
+      if (r > 140 && g < 34 && b < 34) {
+        console.log("detect orange");
+        colors.customColor = 'orange';
+      }
+      return false;
+    });
+
+    console.log(tracking.ColorTracker);
+    var colors = new tracking.ColorTracker(['yellow', 'orange']);
+
+    var count = 0;
+    var countdouble = 0;
+
+    colors.on('track', function(event) {
+      if (event.data.length === 0) {
+        // No colors were detected in this frame.
+      } else {
+
+        event.data.forEach(function(rect) {
+
+          if (rect.color == 'yellow'){
+            let startTime = new Date();
+            console.log("Yellow detected");
+            count++;
+            if (count > 10){
+              play(bassSound);
+              // playSound(1);
+              count = 0;
+              console.log("yellow count reset");
+            } else if ((new Date() - startTime)/1000 > 1000){
+              count = 0;
+            }
+            console.log(now.toLocaleString());
+          }
+
+          if (rect.color == 'orange'){
+            let startTime = new Date();
+            console.log("Orange detected");
+
+            countdouble++;
+
+            if (countdouble > 6){
+              play(snareSound);
+
+              countdouble = 0;
+              console.log("orange count reset");
+            }
+            // else if ((new Date() - startTime)/1000 > 1000){
+            //   count2 = 0;
+            // }
+
+            // snare.play();
+          }
+          console.log(rect.x, rect.y, rect.height, rect.width, rect.color);
+
+        });
+      }
+    });
+
+    // function playSound(soundNumber){
+    //   switch (soundNumber){
+    //     case 1:
+    //       play(bassSound);
+    //
+    //       // bass.currentTime = 0;
+    //       // bass.play();
+    //       console.log(`Bass played at ${ new Date() - now}`);
+    //       break;
+    //     case 2:
+    //       break;
+    //     case 3:
+    //       break;
+    //   }
+    // }
+
+
+  tracking.track('#myVideo', colors);
+  </script>
+</body>
+</html>
