@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>RGBand</title>
-  <script src="../build/tracking-min.js"></script>
+  <script src="../build/tracking.js"></script>
+  <!-- <script src="../src/trackers"></script> -->
   <style>
     body{
       background-color: #b5d1ff;
@@ -23,14 +24,15 @@
   <script>
 
 
-    const bass = './sounds/bass.mp3';
-    const snare = './sounds/snare.mp3';
+    const bass = './sounds/drums-1-bass.mp3';
+    const snare = './sounds/drums-1-snare.mp3';
+    const hihat = './sounds/drums-1-hihat.mp3';
+    const crashcymbal = './sounds/drums-1-crashcymbal.mp3';
 
     const context = new AudioContext();
     // const playButton = document.querySelector('#play');
 
-    let bassSound;
-    let snareSound;
+    let bassSound, snareSound, hihatSound, crashcymbalSound;
 
     function fetchSound(source){
 
@@ -89,17 +91,23 @@
 
 
     // var orange = '#8e2121';
+    // tracking.ColorTracker.registerColor('cyan', function(r, g, b) {
+    //   var thresholdGreen = 50,
+    //     thresholdBlue = 70,
+    //     dx = r - 0,
+    //     dy = g - 255,
+    //     dz = b - 255;
+    //
+    //   if ((g - r) >= thresholdGreen && (b - r) >= thresholdBlue) {
+    //     return true;
+    //   }
+    //   return dx * dx + dy * dy + dz * dz < 6400;
+    // });
 
-    tracking.ColorTracker.registerColor('orange', function(r, g, b) {
-      if (r > 140 && g < 34 && b < 34) {
-        console.log("detect orange");
-        colors.customColor = 'orange';
-      }
-      return false;
-    });
+
 
     console.log(tracking.ColorTracker);
-    var colors = new tracking.ColorTracker(['yellow', 'orange']);
+    var colors = new tracking.ColorTracker(['yellow', 'red']);
 
     var count = 0;
     var countdouble = 0;
@@ -126,9 +134,9 @@
             console.log(now.toLocaleString());
           }
 
-          if (rect.color == 'orange'){
+          if (rect.color == 'red'){
             let startTime = new Date();
-            console.log("Orange detected");
+            console.log("Red detected");
 
             countdouble++;
 
@@ -136,15 +144,18 @@
               play(snareSound);
 
               countdouble = 0;
-              console.log("orange count reset");
+              console.log("red count reset");
+            } else if ((new Date() - startTime)/1000 > 1000){
+              count = 0;
             }
+          }
             // else if ((new Date() - startTime)/1000 > 1000){
             //   count2 = 0;
             // }
 
             // snare.play();
-          }
-          console.log(rect.x, rect.y, rect.height, rect.width, rect.color);
+
+          // console.log(rect.x, rect.y, rect.height, rect.width, rect.color);
 
         });
       }
