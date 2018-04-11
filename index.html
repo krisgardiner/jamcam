@@ -2,6 +2,243 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
+  <title>RGBand</title>
+  <script src="../build/tracking.js"></script>
+  <!-- <script src="../src/trackers"></script> -->
+  <style>
+    body{
+      background-color: #b5d1ff;
+    }
+    #videoWrapper{
+      width: 100%;
+      text-align: center;
+      vertical-align: 30%;
+    }
+    #myVideo{
+      z-index: -1;
+    }
+    #newColorGuide{
+      position: absolute;
+      border: 2px solid red;
+      width: 50px;
+      height: 50px;
+      left: 45%;
+      top: 30%;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <section id="videoWrapper">
+    <video id="myVideo" width="600" height="500" preload autoplay loop muted></video>
+    <div id="newColorGuide">
+    </div>
+  </section>
+  <section id="controlsContainer">
+    <div id="newColorWrapper">
+      <button id="btnNewColor"></button>
+    </div>
+  </section>
+
+  <script>
+
+    const bass = './sounds/drums-1-bass.mp3';
+    const snare = './sounds/drums-1-snare.mp3';
+    const hihat = './sounds/drums-1-hihat.mp3';
+    const crashcymbal = './sounds/drums-1-crashcymbal.mp3';
+
+    const context = new AudioContext();
+    // const playButton = document.querySelector('#play');
+
+    let bassSound, snareSound, hihatSound, crashcymbalSound;
+
+    function fetchSound(source){
+
+      return window.fetch(source)
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+            .then(audioBuffer => {
+              // playButton.disabled = false;
+              // console.log("Audio Buffer:" + audioBuffer);
+
+              return audioBuffer;
+            });
+
+      // return tmpSound;
+    }
+
+    fetchSound(bass).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        bassSound = soundData;
+    });
+
+    fetchSound(snare).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        snareSound = soundData;
+    });
+
+    fetchSound(hihat).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        hihatSound = soundData;
+    });
+
+    fetchSound(crashcymbal).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        crashcymbalSound = soundData;
+    });
+
+      // playButton.onclick = () => play(yodelBuffer);
+
+    function play(audioBuffer) {
+      const source = context.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(context.destination);
+      source.start();
+    }
+
+    // var stream;
+    // var snare = new Audio('./sounds/snare.mp3');
+    // var bass = new Audio('./sounds/bass.mp3');
+    const now  = new Date();
+    const video = document.querySelector('#myVideo');
+    const newColorGuide = document.querySelector('#newColorGuide');
+
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+
+     video.src = window.URL.createObjectURL(stream);
+     video.play();
+
+     });
+    }
+
+    //Attempt to use the canvas to draw the user video to
+    // navigator.mediaDevices.getUserMedia({video: true})
+    //  .then(gotMedia)
+    //  .catch(error => console.error('getUserMedia() error:', error));
+    //
+    // function gotMedia(mediaStream) {
+    //  const mediaStreamTrack = mediaStream.getVideoTracks()[0];
+    //  const imageCapture = new ImageCapture(mediaStreamTrack);
+    //  console.log(imageCapture);
+    //
+    //  imageCapture.grabFrame()
+    //    .then(imageBitmap => {
+    //      canvas.width = imageBitmap.width;
+    //      canvas.height = imageBitmap.height;
+    //      canvas.getContext('2d').drawImage(imageBitmap, 0, 0);
+    //    })
+    //    .catch(error => console.error('grabFrame() error:', error));
+    // }
+
+    // var orange = '#8e2121';
+    // tracking.ColorTracker.registerColor('cyan', function(r, g, b) {
+    //   var thresholdGreen = 50,
+    //     thresholdBlue = 70,
+    //     dx = r - 0,
+    //     dy = g - 255,
+    //     dz = b - 255;
+    //
+    //   if ((g - r) >= thresholdGreen && (b - r) >= thresholdBlue) {
+    //     return true;
+    //   }
+    //   return dx * dx + dy * dy + dz * dz < 6400;
+    // });
+
+    // light blue
+    // rgb(129 < 147, 171 < 189, 205 < 223)
+
+    // dark blue
+    // rgb(58 < 74, 88 < 102, 112 < 129)
+
+    // dark orange
+    // rgb( 110 < 139, 11 < 53, 23 < 69)
+
+    // light orange
+    // rgb( 184 < 212, 58 < 87, 51 < 92)
+
+    // console.log(tracking.ColorTracker);
+    var colors = new tracking.ColorTracker();
+    console.log(colors);
+    console.log(`colors.getColors() ${colors.getColors()}`);
+
+    colors.constructor.registerColor('darkorange', function(r, g, b) {
+      if (r > 110 && r < 139 && g > 11 && g < 53 && b > 23 && b < 69) {
+        return true;
+        console.log('detect dark orange');
+      }
+        return false;
+    });
+    colors.setColors(['magenta', 'darkorange']);
+
+    console.log(`colors.getColors() ${colors.getColors()}`);
+
+
+    var count = 0;
+    var countdouble = 0;
+
+    colors.on('track', function(event) { //same as tracker.on
+        if (event.data.length === 0) {
+            // No colors were detected in this frame.
+        } else {
+            event.data.forEach(function(rect) {
+                console.log(`X:${rect.x}
+                     Y:${rect.y}`);
+                if (rect.color == 'magenta') {
+                    if (rect.x < 250 && rect.y < 300) {
+                        let startTime = new Date();
+                        console.log("Yellow detected");
+                        count++;
+                        if (count > 10) {
+                            play(bassSound);
+                            // playSound(1);
+                            count = 0;
+                            console.log("yellow count reset");
+                        } else if ((new Date() - startTime) / 1000 > 1000) {
+                            count = 0;
+                        }
+                    }
+                }
+                // if (rect.color == 'red'){
+                //     if (rect.x > 250 && rect.y < 300) {
+                //         let startTime = new Date();
+                //         console.log("Red detected");
+                //         countdouble++;
+                //         if (countdouble > 10){
+                //           play(snareSound);
+                //
+                //           countdouble = 0;
+                //           console.log("Red count reset");
+                //         } else if ((new Date() - startTime)/1000 > 1000){
+                //           count = 0;
+                //         }
+                //     }
+                // }
+
+                if (rect.color == 'darkorange'){
+                    // if (rect.x > 250 && rect.y < 300) {
+                        let startTime = new Date();
+                        console.log("Red detected");
+                        countdouble++;
+                        if (countdouble > 10){
+                          play(snareSound);
+
+                          countdouble = 0;
+                          console.log("Red count reset");
+                        } else if ((new Date() - startTime)/1000 > 1000){
+                          count = 0;
+                        }
+                    }
+                // }
+            });
+        }
+    });
+
+
+  tracking.track('#myVideo', colors);
+  </script>
     <meta charset="utf-8">
     <title>RGBand</title>
     <script src="../build/tracking.js"></script>
