@@ -14,15 +14,33 @@
       text-align: center;
       vertical-align: 30%;
     }
+    #myVideo{
+      z-index: -1;
+    }
+    #newColorGuide{
+      position: absolute;
+      border: 2px solid red;
+      width: 50px;
+      height: 50px;
+      left: 45%;
+      top: 30%;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
-  <div id="videoWrapper">
-    <video id="myVideo" width="500" height="400" preload autoplay loop muted></video>
-  </div>
+  <section id="videoWrapper">
+    <video id="myVideo" width="600" height="500" preload autoplay loop muted></video>
+    <div id="newColorGuide">
+    </div>
+  </section>
+  <section id="controlsContainer">
+    <div id="newColorWrapper">
+      <button id="btnNewColor"></button>
+    </div>
+  </section>
 
   <script>
-
 
     const bass = './sounds/drums-1-bass.mp3';
     const snare = './sounds/drums-1-snare.mp3';
@@ -81,9 +99,9 @@
     // var stream;
     // var snare = new Audio('./sounds/snare.mp3');
     // var bass = new Audio('./sounds/bass.mp3');
-    var now  = new Date();
-
-    var video = document.getElementById('myVideo');
+    const now  = new Date();
+    const video = document.querySelector('#myVideo');
+    const newColorGuide = document.querySelector('#newColorGuide');
 
     if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
@@ -143,14 +161,19 @@
     // console.log(tracking.ColorTracker);
     var colors = new tracking.ColorTracker();
     console.log(colors);
+    console.log(`colors.getColors() ${colors.getColors()}`);
 
-    // colors.registerColor('darkorange', function(r, g, b) {
-    //   if (r > 110 && r < 139 && g > 11 && g < 53 && b > 23 && b < 69) {
-    //     return true;
-    //     console.log('detect dark orange');
-    //   }
-    //     return false;
-    // });
+    colors.constructor.registerColor('darkorange', function(r, g, b) {
+      if (r > 110 && r < 139 && g > 11 && g < 53 && b > 23 && b < 69) {
+        return true;
+        console.log('detect dark orange');
+      }
+        return false;
+    });
+    colors.setColors(['magenta', 'darkorange']);
+
+    console.log(`colors.getColors() ${colors.getColors()}`);
+
 
     var count = 0;
     var countdouble = 0;
@@ -162,7 +185,7 @@
             event.data.forEach(function(rect) {
                 console.log(`X:${rect.x}
                      Y:${rect.y}`);
-                if (rect.color == 'yellow') {
+                if (rect.color == 'magenta') {
                     if (rect.x < 250 && rect.y < 300) {
                         let startTime = new Date();
                         console.log("Yellow detected");
@@ -177,24 +200,24 @@
                         }
                     }
                 }
-                if (rect.color == 'red'){
-                    if (rect.x > 250 && rect.y < 300) {
-                        let startTime = new Date();
-                        console.log("Red detected");
-                        countdouble++;
-                        if (countdouble > 10){
-                          play(snareSound);
-
-                          countdouble = 0;
-                          console.log("Red count reset");
-                        } else if ((new Date() - startTime)/1000 > 1000){
-                          count = 0;
-                        }
-                    }
-                }
+                // if (rect.color == 'red'){
+                //     if (rect.x > 250 && rect.y < 300) {
+                //         let startTime = new Date();
+                //         console.log("Red detected");
+                //         countdouble++;
+                //         if (countdouble > 10){
+                //           play(snareSound);
+                //
+                //           countdouble = 0;
+                //           console.log("Red count reset");
+                //         } else if ((new Date() - startTime)/1000 > 1000){
+                //           count = 0;
+                //         }
+                //     }
+                // }
 
                 if (rect.color == 'darkorange'){
-                    if (rect.x > 250 && rect.y < 300) {
+                    // if (rect.x > 250 && rect.y < 300) {
                         let startTime = new Date();
                         console.log("Red detected");
                         countdouble++;
@@ -207,7 +230,7 @@
                           count = 0;
                         }
                     }
-                }
+                // }
             });
         }
     });
