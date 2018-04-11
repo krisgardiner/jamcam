@@ -21,11 +21,11 @@
 <body>
     <div id="videoWrapper">
         <video id="myVideo" width="500" height="400" preload autoplay loop muted></video>
-        <canvas id="canvas" width="500" height="400"></canvas>
+        <!-- <canvas id="canvas" width="500" height="400"></canvas> -->
     </div>
 
     <script>
-        var canvas = document.getElementById('canvas');
+        // var canvas = document.getElementById('canvas');
 
         const bass = './sounds/drums-1-bass.mp3';
         const snare = './sounds/drums-1-snare.mp3';
@@ -112,7 +112,7 @@
         }
 
         //console.log(tracking.ColorTracker);
-        var colors = new tracking.ColorTracker(['yellow']);
+        var colors = new tracking.ColorTracker(['yellow', 'red']);
 
         var count = 0;
         var countdouble = 0;
