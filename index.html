@@ -49,15 +49,24 @@
       // return tmpSound;
     }
 
-    fetchSound(bass).then( soundData => {
-      console.log(`sounddata: ${soundData}`);
-      bassSound = soundData;
+    fetchSound(bass).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        bassSound = soundData;
     });
-    // console.log(`TMP SOUND: ${anotherSound}`);
 
-    fetchSound(snare).then( soundData => {
-      console.log(`sounddata: ${soundData}`);
-      snareSound = soundData;
+    fetchSound(snare).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        snareSound = soundData;
+    });
+
+    fetchSound(hihat).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        hihatSound = soundData;
+    });
+
+    fetchSound(crashcymbal).then(soundData => {
+        console.log(`sounddata: ${soundData}`);
+        crashcymbalSound = soundData;
     });
 
       // playButton.onclick = () => play(yodelBuffer);
@@ -69,13 +78,10 @@
       source.start();
     }
 
-
     // var stream;
     // var snare = new Audio('./sounds/snare.mp3');
     // var bass = new Audio('./sounds/bass.mp3');
     var now  = new Date();
-
-
 
     var video = document.getElementById('myVideo');
 
@@ -89,6 +95,24 @@
      });
     }
 
+    //Attempt to use the canvas to draw the user video to
+    // navigator.mediaDevices.getUserMedia({video: true})
+    //  .then(gotMedia)
+    //  .catch(error => console.error('getUserMedia() error:', error));
+    //
+    // function gotMedia(mediaStream) {
+    //  const mediaStreamTrack = mediaStream.getVideoTracks()[0];
+    //  const imageCapture = new ImageCapture(mediaStreamTrack);
+    //  console.log(imageCapture);
+    //
+    //  imageCapture.grabFrame()
+    //    .then(imageBitmap => {
+    //      canvas.width = imageBitmap.width;
+    //      canvas.height = imageBitmap.height;
+    //      canvas.getContext('2d').drawImage(imageBitmap, 0, 0);
+    //    })
+    //    .catch(error => console.error('grabFrame() error:', error));
+    // }
 
     // var orange = '#8e2121';
     // tracking.ColorTracker.registerColor('cyan', function(r, g, b) {
@@ -104,78 +128,89 @@
     //   return dx * dx + dy * dy + dz * dz < 6400;
     // });
 
+    // light blue
+    // rgb(129 < 147, 171 < 189, 205 < 223)
 
+    // dark blue
+    // rgb(58 < 74, 88 < 102, 112 < 129)
 
-    console.log(tracking.ColorTracker);
-    var colors = new tracking.ColorTracker(['yellow', 'red']);
+    // dark orange
+    // rgb( 110 < 139, 11 < 53, 23 < 69)
+
+    // light orange
+    // rgb( 184 < 212, 58 < 87, 51 < 92)
+
+    // console.log(tracking.ColorTracker);
+    var colors = new tracking.ColorTracker();
+    console.log(colors);
+
+    // colors.registerColor('darkorange', function(r, g, b) {
+    //   if (r > 110 && r < 139 && g > 11 && g < 53 && b > 23 && b < 69) {
+    //     return true;
+    //     console.log('detect dark orange');
+    //   }
+    //     return false;
+    // });
 
     var count = 0;
     var countdouble = 0;
 
-    colors.on('track', function(event) {
-      if (event.data.length === 0) {
-        // No colors were detected in this frame.
-      } else {
+    colors.on('track', function(event) { //same as tracker.on
+        if (event.data.length === 0) {
+            // No colors were detected in this frame.
+        } else {
+            event.data.forEach(function(rect) {
+                console.log(`X:${rect.x}
+                     Y:${rect.y}`);
+                if (rect.color == 'yellow') {
+                    if (rect.x < 250 && rect.y < 300) {
+                        let startTime = new Date();
+                        console.log("Yellow detected");
+                        count++;
+                        if (count > 10) {
+                            play(bassSound);
+                            // playSound(1);
+                            count = 0;
+                            console.log("yellow count reset");
+                        } else if ((new Date() - startTime) / 1000 > 1000) {
+                            count = 0;
+                        }
+                    }
+                }
+                if (rect.color == 'red'){
+                    if (rect.x > 250 && rect.y < 300) {
+                        let startTime = new Date();
+                        console.log("Red detected");
+                        countdouble++;
+                        if (countdouble > 10){
+                          play(snareSound);
 
-        event.data.forEach(function(rect) {
+                          countdouble = 0;
+                          console.log("Red count reset");
+                        } else if ((new Date() - startTime)/1000 > 1000){
+                          count = 0;
+                        }
+                    }
+                }
 
-          if (rect.color == 'yellow'){
-            let startTime = new Date();
-            console.log("Yellow detected");
-            count++;
-            if (count > 10){
-              play(bassSound);
-              // playSound(1);
-              count = 0;
-              console.log("yellow count reset");
-            } else if ((new Date() - startTime)/1000 > 1000){
-              count = 0;
-            }
-            console.log(now.toLocaleString());
-          }
+                if (rect.color == 'darkorange'){
+                    if (rect.x > 250 && rect.y < 300) {
+                        let startTime = new Date();
+                        console.log("Red detected");
+                        countdouble++;
+                        if (countdouble > 10){
+                          play(snareSound);
 
-          if (rect.color == 'red'){
-            let startTime = new Date();
-            console.log("Red detected");
-
-            countdouble++;
-
-            if (countdouble > 6){
-              play(snareSound);
-
-              countdouble = 0;
-              console.log("red count reset");
-            } else if ((new Date() - startTime)/1000 > 1000){
-              count = 0;
-            }
-          }
-            // else if ((new Date() - startTime)/1000 > 1000){
-            //   count2 = 0;
-            // }
-
-            // snare.play();
-
-          // console.log(rect.x, rect.y, rect.height, rect.width, rect.color);
-
-        });
-      }
+                          countdouble = 0;
+                          console.log("Red count reset");
+                        } else if ((new Date() - startTime)/1000 > 1000){
+                          count = 0;
+                        }
+                    }
+                }
+            });
+        }
     });
-
-    // function playSound(soundNumber){
-    //   switch (soundNumber){
-    //     case 1:
-    //       play(bassSound);
-    //
-    //       // bass.currentTime = 0;
-    //       // bass.play();
-    //       console.log(`Bass played at ${ new Date() - now}`);
-    //       break;
-    //     case 2:
-    //       break;
-    //     case 3:
-    //       break;
-    //   }
-    // }
 
 
   tracking.track('#myVideo', colors);
