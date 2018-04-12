@@ -1,6 +1,5 @@
 <!doctype html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <title>JamCam</title>
@@ -76,7 +75,6 @@
       border-radius: 20px;
       background-color: #fefefe;
       box-shadow: 0 0 4px rgba(0,0,0, 0.1);
-
       transition: ease 0.5s;
     }
     .btnWrapper button:hover{
@@ -119,61 +117,47 @@
 
 
   <script>
-
     const bass = './sounds/drums-1-bass.mp3';
     const snare = './sounds/drums-1-snare.mp3';
     const hihat = './sounds/drums-1-hihat.mp3';
     const crashcymbal = './sounds/drums-1-crashcymbal.mp3';
-
     const context = new AudioContext();
     // const playButton = document.querySelector('#play');
-
     let bassSound, /*snareSound,*/ hihatSound, crashcymbalSound;
-
     function fetchSound(source){
-
       return window.fetch(source)
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
             .then(audioBuffer => {
               // playButton.disabled = false;
               // console.log("Audio Buffer:" + audioBuffer);
-
               return audioBuffer;
             });
-
       // return tmpSound;
     }
-
     fetchSound(bass).then(soundData => {
         // console.log(`sounddata: ${soundData}`);
         bassSound = soundData;
     });
-
     // fetchSound(snare).then(soundData => {
     //     // console.log(`sounddata: ${soundData}`);
     //     snareSound = soundData;
     // });
-
     fetchSound(hihat).then(soundData => {
         // console.log(`sounddata: ${soundData}`);
         hihatSound = soundData;
     });
-
     // fetchSound(crashcymbal).then(soundData => {
     //     // console.log(`sounddata: ${soundData}`);
     //     crashcymbalSound = soundData;
     // });
-
       // playButton.onclick = () => play(yodelBuffer);
-
     function play(audioBuffer) {
       const source = context.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(context.destination);
       source.start();
     }
-
     const now  = new Date();
     const video = document.querySelector('#myVideo');
     const newColorGuide = document.querySelector('#newColorGuide');
@@ -182,24 +166,17 @@
     const buttons = document.querySelectorAll('.btnWrapper button')
     const canvasScreenshot = document.querySelector('#canvasScreenshot');
     const THRESHOLD = 2;
-
     // let bassSound = document.querySelector('#sound1'), snareSound = document.querySelector('#sound2'), hihatSound = document.querySelector('#sound3'), crashcymbalSound;
     let snareSound = document.querySelector('#sound2');
-
     // btnNewColor.addEventListener('click', clickNewColor);
     // btnReset.addEventListener('click')
     window.addEventListener('click', onClick);
-
     if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-
      navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-
      video.src = window.URL.createObjectURL(stream);
      video.play();
-
      });
     }
-
     //Attempt to use the canvas to draw the user video to
     // navigator.mediaDevices.getUserMedia({video: true})
     //  .then(gotMedia)
@@ -232,49 +209,25 @@
     //   }
     //   return dx * dx + dy * dy + dz * dz < 6400;
     // });
-
     // light blue
     // rgb(129 < 147, 171 < 189, 205 < 223)
-
     // dark blue
     // rgb(58 < 74, 88 < 102, 112 < 129)
-
     // dark orange
     // rgb( 110 < 139, 11 < 53, 23 < 69)
-
     // light orange
     // rgb( 184 < 212, 58 < 87, 51 < 92)
-
     // console.log(tracking.ColorTracker);
-    var colors = new tracking.ColorTracker();
-    console.log(colors);
-    console.log(`colors.getColors() ${colors.getColors()}`);
-
-    colors.constructor.registerColor('darkorange', function(r, g, b) {
-      if (r > 110 && r < 139 && g > 11 && g < 53 && b > 23 && b < 69) {
-        console.log('detect dark orange');
-        return true;
-      }
-        return false;
-    });
-    colors.setColors(['magenta', 'darkorange']);
-
-    console.log(`colors.getColors() ${colors.getColors()}`);
-
     let trackerTask;
     let colors = [];
     colors.push(new tracking.ColorTracker());
     // console.log(colors);
     console.log(`colors.getColors() ${colors[0].getColors()}`);
-
-
     let colorSet = [false, false, false];
     let count = 0, countdouble = 0, counttriple = 0; //delays for color detection
-
     // startTracking();
     function startTracking(){
       colors[0].on('track', function(event) { //same as tracker.on
-
           if (event.data.length === 0) {
               // No colors were detected in this frame.
           } else {
@@ -295,7 +248,6 @@
                   //         }
                   //     }
                   // }
-
                   //play from audio buffer
                   if (rect.color == 'COLOR1' && colorSet[0]){
                     // let startTime = new Date();
@@ -311,7 +263,6 @@
                     //   count = 0;
                     // }
                   }
-
                   //play from html audio element
                   if (rect.color == 'COLOR2' && colorSet[1]){
                     // let startTime = new Date();
@@ -327,7 +278,6 @@
                     //   countdouble = 0;
                     // }
                   }
-
                   if (rect.color == 'COLOR3' && colorSet[2]){
                     let startTime = new Date();
                     console.log("COLOR3 detected");
@@ -336,7 +286,6 @@
                       // hihatSound.currenttime = 0;
                       // hihatSound.play();
                       play(hihatSound);
-
                       counttriple = 0;
                       console.log("COLOR3 count reset");
                     } else if ((new Date() - startTime)/1000 > 1000){
@@ -358,7 +307,6 @@
                   //         }
                   //     }
                   // }
-
                   // if (rect.color == 'darkorange'){
                   //     // if (rect.x > 250 && rect.y < 300) {
                   //         let startTime = new Date();
@@ -377,13 +325,10 @@
               });
           }
       });
-
       trackerTask = tracking.track('#myVideo', colors[0]);
       trackerTask.run();
     }
-
   // console.log(`pixelRatio: ${pixelRatio}`);
-
   function clickNewColor(){
     let vW = video.clientWidth;
     let vH = video.clientHeight;
@@ -393,15 +338,12 @@
     // console.log(video);
     // console.log(`${video.clientWidth}, ${video.clientHeight}`);
     // console.log(`${canvasW}, ${canvasH}, ${pixelRatio}`);
-
     canvasScreenshot.width = canvasW;
     canvasScreenshot.height = canvasH;
-
     let ctx = canvasScreenshot.getContext('2d');
     ctx.webkitImageSmoothingEnabled = true;
     ctx.msImageSmoothingEnabled = true;
     ctx.imageSmoothingEnabled = true;
-
     // Draws current image from the video element into the canvas
     // console.log(`
     //   ${newColorGuide.offsetLeft},
@@ -418,31 +360,25 @@
     // } else if (colorSet[0]){
     //   drawImgMultiplier = 0;
     // }
-
     let sX = newColorGuide.offsetLeft-video.offsetLeft;
     let sY = newColorGuide.offsetTop-video.offsetTop;
     let sWidth = newColorGuide.offsetWidth;
     let sHeight = newColorGuide.offsetHeight;
     // let dMargin = 30;
     // let dX = 0 + (dMargin * drawImgMultiplier);
-
     ctx.drawImage(video, sX, sY, sWidth, sHeight, 0, 0, sWidth, sHeight);
-
     // console.log(sX, sY);
     let imageData = ctx.getImageData(0, 0, newColorGuide.offsetWidth, newColorGuide.offsetHeight);
     // console.log(ctx);
     // console.log(`imageData Pos: ${ctx}`);
-
     //Grabs all the data in scanned image
     let data = imageData.data;
     let rMin = 255, rMax = 0, gMin = 255, gMax = 0, bMin = 255, bMax = 0;
-
     //sorts through imageData.data array to find rgb min and max values
     for (let i = 0; i < data.length; i += 4){
       data[i]; //r
       data[i+1]; //g
       data[i+2]; //b
-
       if (data[i] < rMin){ rMin = data[i]; };
       if (data[i] > rMax){ rMax = data[i]; };
       if (data[i+1] < gMin){ gMin = data[i+1]; };
@@ -450,19 +386,15 @@
       if (data[i+2] < bMin){ bMin = data[i+2]; };
       if (data[i+2] > bMax){ bMax = data[i+2]; };
     }
-
     // console.log(`rMin: ${rMin}
     //   rMax: ${rMax}
     //   gMin: ${gMin}
     //   gMax: ${gMax}
     //   bMin: ${bMin}
     //   bMax: ${bMax}`);
-
     registerColor(rMin, rMax, gMin, gMax, bMin, bMax);
   }
-
   function registerColor(R_MIN, R_MAX, G_MIN, G_MAX, B_MIN, B_MAX){
-
     if (!colorSet[0]){
       colors[0].constructor.registerColor('COLOR1', function(r, g, b) {
         if (r > R_MIN - THRESHOLD && r < R_MAX + THRESHOLD && g > G_MIN - THRESHOLD && g < G_MAX + THRESHOLD && b > B_MIN - THRESHOLD && b < B_MAX + THRESHOLD) {
@@ -470,11 +402,9 @@
         }
           return false;
       });
-
       colorSet[0] = true;
       colors[0].setColors(['COLOR1']);
       console.log(`getColors(): ${colors[0].getColors()}`);
-
     } else if (!colorSet[1]){
       colors[0].constructor.registerColor('COLOR2', function(r, g, b) {
         if (r > R_MIN - THRESHOLD && r < R_MAX + THRESHOLD && g > G_MIN - THRESHOLD && g < G_MAX + THRESHOLD && b > B_MIN - THRESHOLD && b < B_MAX + THRESHOLD) {
@@ -482,11 +412,9 @@
         }
           return false;
       });
-
       colorSet[1] = true;
       colors[0].setColors(['COLOR1', 'COLOR2']);
       console.log(`getColors(): ${colors[0].getColors()}`);
-
     } else if (!colorSet[2]){
       colors[0].constructor.registerColor('COLOR3', function(r, g, b) {
         if (r > R_MIN - THRESHOLD && r < R_MAX + THRESHOLD && g > G_MIN - THRESHOLD && g < G_MAX + THRESHOLD && b > B_MIN - THRESHOLD && b < B_MAX + THRESHOLD) {
@@ -494,30 +422,23 @@
         }
           return false;
       });
-
       colorSet[2] = true;
       colors[0].setColors(['COLOR1', 'COLOR2', 'COLOR3']);
       console.log(`getColors(): ${colors[0].getColors()}`);
-
       btnNewColor.style.visibility = 'hidden';
       btnReset.style.visibility = 'visible';
       startTracking();
     }
   }
-
   function reset(){
     trackerTask.stop();
     colors.unshift(new tracking.ColorTracker());
     colors.pop();
-
     btnNewColor.style.visibility = 'visible';
     btnReset.style.visibility = 'hidden';
     console.log(`getColors(): ${colors[0].getColors()}`);
-
     colorSet = [false,false,false];
-
   }
-
   function onClick(event){
     if (event.target.value == 'reset') { reset(); }
     if (event.target.value == 'register') { clickNewColor(); }
