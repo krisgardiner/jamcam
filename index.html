@@ -3,43 +3,120 @@
 
 <head>
   <meta charset="utf-8">
-  <title>RGBand</title>
+  <title>JamCam</title>
   <script src="../build/tracking.js"></script>
   <!-- <script src="../src/trackers"></script> -->
   <style>
-    body{
+    body, html{
       background-color: #b5d1ff;
+      margin: 0;
+      padding: 0;
     }
     #videoWrapper{
+      position: relative;
       width: 100%;
+      height: auto;
       text-align: center;
-      vertical-align: 30%;
+    }
+    #videoWrapWrapper{
+      top: 0;
+      left: 0;
+      /* width: 700px; */
+      /* height: 525px; */
     }
     #myVideo{
+      top: 0;
+      left: 0;
       z-index: -1;
     }
     #newColorGuide{
       position: absolute;
-      border: 2px solid red;
+      border: 1px solid red;
       width: 50px;
       height: 50px;
-      left: 45%;
-      top: 30%;
+      left: 450px;
+      top: 250px;
       z-index: 10;
+    }
+    #canvasWrapper{
+      width: 100%;
+      text-align: center;
+    }
+    #currentColorWrapper{
+      height: 0;
+    }
+    .currentColors{
+      width: 30%;
+      padding: 1.5%;
+      height: 50px;
+    }
+    #canvasScreenshot{
+    }
+    #controlsContainer{
+      top: 500px;
+      padding: 2%;
+      height: auto;
+    }
+    #btnNewColor{
+      visibility: visible;
+    }
+    #btnReset{
+      visibility: hidden;
+    }
+    .btnWrapper{
+      float: left;
+      width: 20%;
+      margin: 2%;
+    }
+    .btnWrapper button{
+      border: none;
+      width: 100%;
+      height: 55px;
+      padding: 5%;
+      border-radius: 20px;
+      background-color: #fefefe;
+      box-shadow: 0 0 4px rgba(0,0,0, 0.1);
+
+      transition: ease 0.5s;
+    }
+    .btnWrapper button:hover{
+      background-color: #fafafa;
+      box-shadow: 0 0 8px rgba(0,0,0, 0.4);
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <section id="videoWrapper">
-    <video id="myVideo" width="600" height="500" preload autoplay loop muted></video>
-    <div id="newColorGuide">
+    <div id="videoWrapWrapper">
+      <video id="myVideo" preload autoplay loop muted></video>
+      <div id="newColorGuide">
+    </div>
+    </div>
+  </section>
+  <section id="canvasWrapper">
+    <canvas id="canvasScreenshot"></canvas>
+  </section>
+  <section id="currentColorWrapper">
+    <div id="currentColor1" class="currentColors">
+    </div>
+    <div id="currentColor2" class="currentColors">
+    </div>
+    <div id="currentColor3" class="currentColors">
     </div>
   </section>
   <section id="controlsContainer">
-    <div id="newColorWrapper">
-      <button id="btnNewColor"></button>
+    <div class="btnWrapper">
+      <button id="btnNewColor" value="register">Register New Color</button>
+    </div>
+    <div class="btnWrapper">
+      <button id="btnReset" value="reset">Reset</button>
     </div>
   </section>
+  <audio id="sound1" src="./sounds/drums-1-bass.mp3"></audio>
+  <audio id="sound2" src="./sounds/drums-1-snare.mp3"></audio>
+  <audio id="sound3" src="./sounds/drums-1-hihat.mp3"></audio>
+
 
   <script>
 
@@ -51,7 +128,7 @@
     const context = new AudioContext();
     // const playButton = document.querySelector('#play');
 
-    let bassSound, snareSound, hihatSound, crashcymbalSound;
+    let bassSound, /*snareSound,*/ hihatSound, crashcymbalSound;
 
     function fetchSound(source){
 
@@ -69,24 +146,24 @@
     }
 
     fetchSound(bass).then(soundData => {
-        console.log(`sounddata: ${soundData}`);
+        // console.log(`sounddata: ${soundData}`);
         bassSound = soundData;
     });
 
-    fetchSound(snare).then(soundData => {
-        console.log(`sounddata: ${soundData}`);
-        snareSound = soundData;
-    });
+    // fetchSound(snare).then(soundData => {
+    //     // console.log(`sounddata: ${soundData}`);
+    //     snareSound = soundData;
+    // });
 
     fetchSound(hihat).then(soundData => {
-        console.log(`sounddata: ${soundData}`);
+        // console.log(`sounddata: ${soundData}`);
         hihatSound = soundData;
     });
 
-    fetchSound(crashcymbal).then(soundData => {
-        console.log(`sounddata: ${soundData}`);
-        crashcymbalSound = soundData;
-    });
+    // fetchSound(crashcymbal).then(soundData => {
+    //     // console.log(`sounddata: ${soundData}`);
+    //     crashcymbalSound = soundData;
+    // });
 
       // playButton.onclick = () => play(yodelBuffer);
 
@@ -97,12 +174,21 @@
       source.start();
     }
 
-    // var stream;
-    // var snare = new Audio('./sounds/snare.mp3');
-    // var bass = new Audio('./sounds/bass.mp3');
     const now  = new Date();
     const video = document.querySelector('#myVideo');
     const newColorGuide = document.querySelector('#newColorGuide');
+    const btnNewColor = document.querySelector('#btnNewColor');
+    const btnReset = document.querySelector('#btnReset');
+    const buttons = document.querySelectorAll('.btnWrapper button')
+    const canvasScreenshot = document.querySelector('#canvasScreenshot');
+    const THRESHOLD = 2;
+
+    // let bassSound = document.querySelector('#sound1'), snareSound = document.querySelector('#sound2'), hihatSound = document.querySelector('#sound3'), crashcymbalSound;
+    let snareSound = document.querySelector('#sound2');
+
+    // btnNewColor.addEventListener('click', clickNewColor);
+    // btnReset.addEventListener('click')
+    window.addEventListener('click', onClick);
 
     if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
@@ -132,7 +218,7 @@
     //    })
     //    .catch(error => console.error('grabFrame() error:', error));
     // }
-
+    //
     // var orange = '#8e2121';
     // tracking.ColorTracker.registerColor('cyan', function(r, g, b) {
     //   var thresholdGreen = 50,
@@ -175,68 +261,267 @@
 
     console.log(`colors.getColors() ${colors.getColors()}`);
 
+    let trackerTask;
+    let colors = [];
+    colors.push(new tracking.ColorTracker());
+    // console.log(colors);
+    console.log(`colors.getColors() ${colors[0].getColors()}`);
 
-    var count = 0;
-    var countdouble = 0;
 
-    colors.on('track', function(event) { //same as tracker.on
-        if (event.data.length === 0) {
-            // No colors were detected in this frame.
-        } else {
-            event.data.forEach(function(rect) {
-                console.log(`X:${rect.x}
-                     Y:${rect.y}`);
-                if (rect.color == 'magenta') {
-                    if (rect.x < 250 && rect.y < 300) {
-                        let startTime = new Date();
-                        console.log("Yellow detected");
-                        count++;
-                        if (count > 10) {
-                            play(bassSound);
-                            // playSound(1);
-                            count = 0;
-                            console.log("yellow count reset");
-                        } else if ((new Date() - startTime) / 1000 > 1000) {
-                            count = 0;
-                        }
+    let colorSet = [false, false, false];
+    let count = 0, countdouble = 0, counttriple = 0; //delays for color detection
+
+    // startTracking();
+    function startTracking(){
+      colors[0].on('track', function(event) { //same as tracker.on
+
+          if (event.data.length === 0) {
+              // No colors were detected in this frame.
+          } else {
+              event.data.forEach(function(rect) {
+                  console.log(`X:${rect.x}
+                       Y:${rect.y}`);
+                  // if (rect.color == 'magenta') {
+                  //     if (rect.x < 250 && rect.y < 300) {
+                  //         let startTime = new Date();
+                  //         console.log("Magenta detected");
+                  //         count++;
+                  //         if (count > 10) {
+                  //             play(bassSound);
+                  //             count = 0;
+                  //             console.log("Magenta count reset");
+                  //         } else if ((new Date() - startTime) / 1000 > 1000) {
+                  //             count = 0;
+                  //         }
+                  //     }
+                  // }
+
+                  //play from audio buffer
+                  if (rect.color == 'COLOR1' && colorSet[0]){
+                    // let startTime = new Date();
+                    // console.log("COLOR1 detected");
+                    // count++;
+                    // if (count > 5){
+                      // bassSound.currenttime = 0;
+                      // bassSound.play();
+                      play(bassSound);
+                    //   count = 0;
+                    //   console.log("COLOR1 count reset");
+                    // } else if ((new Date() - startTime)/1000 > 1000){
+                    //   count = 0;
+                    // }
+                  }
+
+                  //play from html audio element
+                  if (rect.color == 'COLOR2' && colorSet[1]){
+                    // let startTime = new Date();
+                    // console.log("COLOR2 detected");
+                    // countdouble++;
+                    // if (countdouble > 5){
+                      snareSound.currenttime = 0;
+                      snareSound.play();
+                      // play(snareSound);
+                    //   countdouble = 0;
+                    //   console.log("COLOR2 count reset");
+                    // } else if ((new Date() - startTime)/1000 > 1000){
+                    //   countdouble = 0;
+                    // }
+                  }
+
+                  if (rect.color == 'COLOR3' && colorSet[2]){
+                    let startTime = new Date();
+                    console.log("COLOR3 detected");
+                    counttriple++;
+                    if (counttriple > 5){
+                      // hihatSound.currenttime = 0;
+                      // hihatSound.play();
+                      play(hihatSound);
+
+                      counttriple = 0;
+                      console.log("COLOR3 count reset");
+                    } else if ((new Date() - startTime)/1000 > 1000){
+                      counttriple = 0;
                     }
-                }
-                // if (rect.color == 'red'){
-                //     if (rect.x > 250 && rect.y < 300) {
-                //         let startTime = new Date();
-                //         console.log("Red detected");
-                //         countdouble++;
-                //         if (countdouble > 10){
-                //           play(snareSound);
-                //
-                //           countdouble = 0;
-                //           console.log("Red count reset");
-                //         } else if ((new Date() - startTime)/1000 > 1000){
-                //           count = 0;
-                //         }
-                //     }
-                // }
+                  }
+                  // if (rect.color == 'red'){
+                  //     if (rect.x > 250 && rect.y < 300) {
+                  //         let startTime = new Date();
+                  //         console.log("Red detected");
+                  //         countdouble++;
+                  //         if (countdouble > 10){
+                  //           play(snareSound);
+                  //
+                  //           countdouble = 0;
+                  //           console.log("Red count reset");
+                  //         } else if ((new Date() - startTime)/1000 > 1000){
+                  //           count = 0;
+                  //         }
+                  //     }
+                  // }
 
-                if (rect.color == 'darkorange'){
-                    // if (rect.x > 250 && rect.y < 300) {
-                        let startTime = new Date();
-                        console.log("Red detected");
-                        countdouble++;
-                        if (countdouble > 10){
-                          play(snareSound);
+                  // if (rect.color == 'darkorange'){
+                  //     // if (rect.x > 250 && rect.y < 300) {
+                  //         let startTime = new Date();
+                  //         console.log("Red detected");
+                  //         countdouble++;
+                  //         if (countdouble > 10){
+                  //           play(snareSound);
+                  //
+                  //           countdouble = 0;
+                  //           console.log("Red count reset");
+                  //         } else if ((new Date() - startTime)/1000 > 1000){
+                  //           count = 0;
+                  //         }
+                  //     }
+                  // }
+              });
+          }
+      });
 
-                          countdouble = 0;
-                          console.log("Red count reset");
-                        } else if ((new Date() - startTime)/1000 > 1000){
-                          count = 0;
-                        }
-                    }
-                // }
-            });
+      trackerTask = tracking.track('#myVideo', colors[0]);
+      trackerTask.run();
+    }
+
+  // console.log(`pixelRatio: ${pixelRatio}`);
+
+  function clickNewColor(){
+    let vW = video.clientWidth;
+    let vH = video.clientHeight;
+    let pixelRatio = Number(vW / vH);
+    let canvasW = video.clientWidth - 100;
+    let canvasH = Number(canvasW / pixelRatio);
+    // console.log(video);
+    // console.log(`${video.clientWidth}, ${video.clientHeight}`);
+    // console.log(`${canvasW}, ${canvasH}, ${pixelRatio}`);
+
+    canvasScreenshot.width = canvasW;
+    canvasScreenshot.height = canvasH;
+
+    let ctx = canvasScreenshot.getContext('2d');
+    ctx.webkitImageSmoothingEnabled = true;
+    ctx.msImageSmoothingEnabled = true;
+    ctx.imageSmoothingEnabled = true;
+
+    // Draws current image from the video element into the canvas
+    // console.log(`
+    //   ${newColorGuide.offsetLeft},
+    //   ${newColorGuide.offsetTop},
+    //   ${canvasScreenshot.offsetLeft},
+    //   ${canvasScreenshot.offsetTop},
+    //   ${canvasScreenshot.offsetWidth},
+    //   ${canvasScreenshot.offsetHeight}`);
+    // let drawImgMultiplier;
+    // if(colorSet[2]){
+    //   drawImgMultiplier = 2;
+    // } else if (colorSet[1]){
+    //   drawImgMultiplier = 1;
+    // } else if (colorSet[0]){
+    //   drawImgMultiplier = 0;
+    // }
+
+    let sX = newColorGuide.offsetLeft-video.offsetLeft;
+    let sY = newColorGuide.offsetTop-video.offsetTop;
+    let sWidth = newColorGuide.offsetWidth;
+    let sHeight = newColorGuide.offsetHeight;
+    // let dMargin = 30;
+    // let dX = 0 + (dMargin * drawImgMultiplier);
+
+    ctx.drawImage(video, sX, sY, sWidth, sHeight, 0, 0, sWidth, sHeight);
+
+    // console.log(sX, sY);
+    let imageData = ctx.getImageData(0, 0, newColorGuide.offsetWidth, newColorGuide.offsetHeight);
+    // console.log(ctx);
+    // console.log(`imageData Pos: ${ctx}`);
+
+    //Grabs all the data in scanned image
+    let data = imageData.data;
+    let rMin = 255, rMax = 0, gMin = 255, gMax = 0, bMin = 255, bMax = 0;
+
+    //sorts through imageData.data array to find rgb min and max values
+    for (let i = 0; i < data.length; i += 4){
+      data[i]; //r
+      data[i+1]; //g
+      data[i+2]; //b
+
+      if (data[i] < rMin){ rMin = data[i]; };
+      if (data[i] > rMax){ rMax = data[i]; };
+      if (data[i+1] < gMin){ gMin = data[i+1]; };
+      if (data[i+1] > gMax){ gMax = data[i+1]; };
+      if (data[i+2] < bMin){ bMin = data[i+2]; };
+      if (data[i+2] > bMax){ bMax = data[i+2]; };
+    }
+
+    // console.log(`rMin: ${rMin}
+    //   rMax: ${rMax}
+    //   gMin: ${gMin}
+    //   gMax: ${gMax}
+    //   bMin: ${bMin}
+    //   bMax: ${bMax}`);
+
+    registerColor(rMin, rMax, gMin, gMax, bMin, bMax);
+  }
+
+  function registerColor(R_MIN, R_MAX, G_MIN, G_MAX, B_MIN, B_MAX){
+
+    if (!colorSet[0]){
+      colors[0].constructor.registerColor('COLOR1', function(r, g, b) {
+        if (r > R_MIN - THRESHOLD && r < R_MAX + THRESHOLD && g > G_MIN - THRESHOLD && g < G_MAX + THRESHOLD && b > B_MIN - THRESHOLD && b < B_MAX + THRESHOLD) {
+          return true;
         }
-    });
+          return false;
+      });
 
-  tracking.track('#myVideo', colors);
+      colorSet[0] = true;
+      colors[0].setColors(['COLOR1']);
+      console.log(`getColors(): ${colors[0].getColors()}`);
+
+    } else if (!colorSet[1]){
+      colors[0].constructor.registerColor('COLOR2', function(r, g, b) {
+        if (r > R_MIN - THRESHOLD && r < R_MAX + THRESHOLD && g > G_MIN - THRESHOLD && g < G_MAX + THRESHOLD && b > B_MIN - THRESHOLD && b < B_MAX + THRESHOLD) {
+          return true;
+        }
+          return false;
+      });
+
+      colorSet[1] = true;
+      colors[0].setColors(['COLOR1', 'COLOR2']);
+      console.log(`getColors(): ${colors[0].getColors()}`);
+
+    } else if (!colorSet[2]){
+      colors[0].constructor.registerColor('COLOR3', function(r, g, b) {
+        if (r > R_MIN - THRESHOLD && r < R_MAX + THRESHOLD && g > G_MIN - THRESHOLD && g < G_MAX + THRESHOLD && b > B_MIN - THRESHOLD && b < B_MAX + THRESHOLD) {
+          return true;
+        }
+          return false;
+      });
+
+      colorSet[2] = true;
+      colors[0].setColors(['COLOR1', 'COLOR2', 'COLOR3']);
+      console.log(`getColors(): ${colors[0].getColors()}`);
+
+      btnNewColor.style.visibility = 'hidden';
+      btnReset.style.visibility = 'visible';
+      startTracking();
+    }
+  }
+
+  function reset(){
+    trackerTask.stop();
+    colors.unshift(new tracking.ColorTracker());
+    colors.pop();
+
+    btnNewColor.style.visibility = 'visible';
+    btnReset.style.visibility = 'hidden';
+    console.log(`getColors(): ${colors[0].getColors()}`);
+
+    colorSet = [false,false,false];
+
+  }
+
+  function onClick(event){
+    if (event.target.value == 'reset') { reset(); }
+    if (event.target.value == 'register') { clickNewColor(); }
+  }
   </script>
 </body>
 </html>
