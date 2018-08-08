@@ -1,0 +1,222 @@
+/*
+#98fbe4 	(152,251,228)
+#ffc5a5 	(255,197,165)
+#ff90e4 	(255,144,228)
+#fd9595 	(253,149,149)
+#c1ffc2 	(193,255,194)
+*/
+  body, html{
+    background-color: rgba(235,235,235, 0.4);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+  }
+  #cover{
+    position: absolute;
+    width: 100%;
+    height: 100vw;
+    opacity: 1;
+    background-color: rgba(255,255,255, 1);
+    text-align: center;
+
+
+    transition: ease 1s;
+    z-index: 5;
+  }
+  #cover h1, #cover p{
+    font-family: 'Helvetica', sans-serif;
+    letter-spacing: 2px;
+    color: rgba(100, 100, 100, 0.8);
+  }
+  #cover h1{
+    margin-top: 30vh;
+    font-size: 3em;
+    text-shadow: 0 4px 2px rgba(69, 69, 69, 0.2);
+  }
+  #cover p{
+    margin-top: 10vh;
+  }
+  #cover button{
+    width: 30%;
+    height: 90px;
+
+    border: none;
+    border-radius: 20px;
+    background-color: rgba(241,241,241, 0.8);
+    box-shadow: 0 0 8px rgba(0,0,0, 0.3);
+
+    font-size: 1.5em;
+    font-family: 'Helvetica', sans-serif;
+    letter-spacing: 2px;
+    /* line-height: 1.4em; */
+    color: rgba(100, 100, 100, 0.6);
+
+    transition: ease 0.2s;
+  }
+
+  #cover button:hover{
+  box-shadow: 0 0 8px rgba(0,0,0, 0.4);
+  transform: scale(1.1);
+
+  cursor: pointer;
+  }
+
+  #videoWrapper{
+    position: relative;
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+  #videoWrapWrapper{
+    top: 0;
+    left: 0;
+  }
+  #myVideo{
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  #newColorGuide{
+    position: absolute;
+    border: 1px solid red;
+    width: 20px;
+    height: 20px;
+    left: 450px;
+    top: 250px;
+    z-index: 10;
+    opacity: 0;
+    transition: ease 0.5s;
+  }
+  #presetsWrapper{
+    position: absolute;
+    z-index: 4;
+    width: 96%;
+    height: 100%;
+    padding: 2%;
+    top: 0;
+    left: 0;
+    background-color: rgba(243, 243, 243, 0.6);
+    opacity: 0;
+    transition: ease 0.5s;
+  }
+  #presetCategoryWrapper{
+    display: none;
+    transition: ease 0.5s;
+  }
+  #presetTrackWrapper{
+    display: none;
+    transition: ease 0.5s;
+  }
+  .btnPresetWrapper, .btnCategoryWrapper{
+    position: relative;
+    float: left;
+    width: 23%;
+
+    margin: 1%;
+  }
+  .btnPresetWrapper button, .btnCategoryWrapper button{
+    width: 100%;
+    height: 80px;
+    padding: 5%;
+
+    border: none;
+    border-radius: 20px;
+    background-color: rgba(241,241,241, 0.8);
+    box-shadow: 0 0 8px rgba(0,0,0, 0.3);
+
+    font-size: 1.1em;
+    font-family: 'Helvetica', sans-serif;
+    letter-spacing: 2px;
+    line-height: 1.4em;
+    color: rgba(100, 100, 100, 0.8);
+
+    transition: ease 0.2s;
+  }
+  .btnCategoryWrapper button:hover{
+    box-shadow: 0 0 8px rgba(0,0,0, 0.4);
+    transform: scale(1.1);
+
+    cursor: pointer;
+  }
+
+  .btnPresetWrapper button:hover{
+    background-color: rgba(0, 186, 255, 0.6);
+    box-shadow: 0 0 8px rgba(0,0,0, 0.4);
+
+    color: rgba(240, 240, 240, 1);
+    text-shadow: 0 0 2px rgba(0, 109, 149, 0.9);
+    transform: translateY(2px);
+    transform: scale(1.1);
+    cursor: pointer;
+  }
+  #canvasWrapper{
+    display: none;
+    width: 100%;
+    text-align: center;
+  }
+  #currentColorWrapper{
+    display: flex;
+  }
+  .currentColors{
+    flex-grow: 1;
+    padding: 1.5%;
+    height: 100px;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    color: rgba(125, 125, 125, 0.9);
+    font-size: 1.5em;
+    font-family: 'Helvetica', sans-serif;
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    transition: ease 0.5s;
+  }
+  #canvasScreenshot{
+  }
+  #controlsContainer{
+    position: relative;
+    padding: 2%;
+    height: 100px;
+  }
+  #btnNewColor{
+    visibility: visible;
+  }
+  #btnReset{
+    visibility: visible;
+  }
+
+  .btnWrapper{
+    position: relative;
+    float: left;
+    width: 23%;
+    margin: 1%;
+    height: 50px;
+  }
+  .btnWrapper button{
+    position: relative;
+    border: none;
+    width: 100%;
+    height: 100px;
+    padding: 5%;
+    border-radius: 20px;
+    background: rgba(241,241,241, 0.6);
+    box-shadow: 0 0 8px rgba(0,0,0, 0.2);
+
+    font-size: 1.2em;
+    font-family: 'Helvetica', sans-serif;
+    letter-spacing: 2px;
+    line-height: 1.4em;
+    color: rgba(100, 100, 100, 0.8);
+
+    transition: ease 0.2s;
+  }
+  .btnWrapper button:hover{
+    box-shadow: 0 0 12px rgba(0,0,0, 0.4);
+    cursor: pointer;
+    transform: translateY(2px);
+    transform: scale(1.05);
+  }
+  .activeBtn {
+    background: rgba(100,100,100, 0.4);
+  }
